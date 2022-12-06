@@ -4,7 +4,7 @@
 include('./config/db_connection.php');
 
     $input = '';
-    $errors = array('input' => '');
+    // $errors = array('input' => '');
 
 
 
@@ -53,41 +53,44 @@ if(array_filter($errors)){
         // error
         echo 'query error: ' . mysqli_error($conn);
     }
-}
+};
 
 
 // Update databas
+$('.check-input').click(function(){
+    $done = "done";
+    $undone = "undone";
 
-// function update() { 
-//     if (isset($_POST['update'])){
+    $id_to_update = mysqli_real_escape_string($conn, $_POST['id_to_change']);
 
-//         // escape sql chars
-//         $id_to_delete = mysqli_real_escape_string($conn, $_POST['update']);
+        $Sql = "SELECT * FROM todos WHERE id = $id_to_change";
+
+        // make query and get result
+        $data = mysqli_query($conn, $Sql);
         
-//         // make sql
-//         $sql = "UPDATE `todos` SET `status`='['done']', WHERE id = $id_to_delete";
+        // fetching and turning data to assoc array
+        $todos  = mysqli_fetch_all($data, MYSQLI_ASSOC);
+        
+    if ($(this).is(':checked')){
+    //   if (isset($_POST['change'])){
+           // make sql
+            $sql = "UPDATE `todos` SET `status`= 'done' WHERE id = $id_to_change";
+            $result = mysqli_query($conn, $sql);
+            // fetching the resulting rowa as an array
+      //   if($result){
+        // success
+        // header('Location: index.php');
+       //   } else {
+       //     // failure
+       //     echo 'query error: ' . mysqli_error($conn);
+      //   }
 
-//         // make query and get result
-//         $result = mysqli_query($conn, $sql);
-
-//         // fetching the resulting rowa as an array
-//          $todo = mysqli_fetch_all($result, MYSQLI_ASSOC);
-    
-//       if($result){
-//         // success
-//         if ($todo['status'] == "undone") {
-//            $Sql = "UPDATE `todos` SET `status`='['done']', WHERE id = $id_to_delete";
-//           } else if ($todo['status'] == "done") {
-//             $Sql = "UPDATE `todos` SET `status`='['undone']', WHERE id = $id_to_delete";
-//           }
-//       } else {
-//         // failure
-//         echo 'query error: ' . mysqli_error($conn);
-//       }
-    
-//     }
-// }
-
+    } else {
+        // uncheck
+        $sql = "UPDATE `todos` SET `status`= 'undone' WHERE id = $id_to_change";
+        $result = mysqli_query($conn, $sql);
+    }
+});
 
 
 
@@ -141,7 +144,7 @@ mysqli_close($conn);
                 <div>
                     <form action="index.php" method="POST">
                         <input type="text" name="input" class="todo-input" placeholder="What do you need to do today?"
-                            <?php echo htmlspecialchars($input) ?> />
+                            <?php echo htmlspecialchars($input);  ?> />
                         <button class="add-btn" type="submit">
                             Add
                         </button>
@@ -158,16 +161,26 @@ mysqli_close($conn);
                 <div class="todo-list">
                     <ul class="ul">
                         <li class="li">
-                            <input method="POST" type="checkbox" class="check-input" name="update" value="Update"
-                                <?php echo $done ?> />
-                            <label class="<?php echo $line ?> todo-label"
+
+
+                            <form action="index.php" method="POST">
+                                <input type="hidden" name="id_to_change" value="<?php echo $todo['id'];?>">
+                                <input type="checkbox" class="check-input" name="change" value="Change"
+                                    <?php echo $done;?> />
+
+                            </form>
+
+
+                            <label class=" <?php echo $line ?> todo-label"
                                 for=""><?php echo htmlspecialchars($todo['content']); ?></label>
+
                             <form action="index.php" method="POST">
                                 <input type="hidden" name="id_to_delete" value="<?php echo $todo['id'];?>">
                                 <button type="submit" name="delete" value="Delete" class="delete-btn">
                                     <i class="fa-solid fa-trash"></i>
                                 </button>
                             </form>
+
                         </li>
                     </ul>
 
